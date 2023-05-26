@@ -558,7 +558,7 @@ void QgsRelationReferenceWidget::highlightFeature( QgsFeature f, CanvasExtent ca
     {
       extent.combineExtentWith( featBBox );
       extent.scale( 1.1 );
-      mCanvas->setExtent( extent, true );
+      mCanvas->setExtent( extent, true, true );
       mCanvas->refresh();
     }
   }

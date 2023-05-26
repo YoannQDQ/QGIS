@@ -422,7 +422,7 @@ void QgsGeometryCheckerResultTab::highlightErrors( bool current )
 
   if ( !totextent.isEmpty() )
   {
-    mIface->mapCanvas()->setExtent( totextent, true );
+    mIface->mapCanvas()->setExtent( totextent, true, true );
   }
   mIface->mapCanvas()->refresh();
 }

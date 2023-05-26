@@ -260,7 +260,7 @@ void QgsGpsCanvasBridge::gpsStateChanged( const QgsGpsInformation &info )
           if ( mCenteringMode == Qgis::MapRecenteringMode::Always ||
                ( mCenteringMode == Qgis::MapRecenteringMode::WhenOutsideVisibleExtent && !extentLimit.contains( point ) ) )
           {
-            mCanvas->setExtent( rect, true );
+            mCanvas->setExtent( rect, true, true );
             mCanvas->refresh();
           }
         }

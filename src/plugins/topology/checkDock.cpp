@@ -215,7 +215,7 @@ void checkDock::errorListClicked( const QModelIndex &index )
   QgsRectangle r = mErrorList.at( row )->boundingBox();
   r.scale( 1.5 );
   QgsMapCanvas *canvas = qgsInterface->mapCanvas();
-  canvas->setExtent( r, true );
+  canvas->setExtent( r, true, true );
   canvas->refresh();
 
   mFixBox->clear();
