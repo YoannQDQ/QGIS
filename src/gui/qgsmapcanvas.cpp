@@ -503,14 +503,14 @@ void QgsMapCanvas::setDestinationCrs( const QgsCoordinateReferenceSystem &crs )
 
   // try to reproject current extent to the new one
   QgsRectangle rect;
-  if ( !mSettings.visibleExtent().isEmpty() )
+  if ( !extent().isEmpty() )
   {
     const QgsCoordinateTransform transform( mSettings.destinationCrs(), crs, QgsProject::instance(),
                                             Qgis::CoordinateTransformationFlag::BallparkTransformsAreAppropriate
                                             | Qgis::CoordinateTransformationFlag::IgnoreImpossibleTransformations );
     try
     {
-      rect = transform.transformBoundingBox( mSettings.visibleExtent() );
+      rect = transform.transformBoundingBox( extent() );
     }
     catch ( QgsCsException &e )
     {
@@ -1467,7 +1467,7 @@ QgsRectangle QgsMapCanvas::projectExtent() const
   return rect;
 }
 
-void QgsMapCanvas::setExtent( const QgsRectangle &r, bool magnified )
+void QgsMapCanvas::setExtent( const QgsRectangle &r, bool magnified, bool ensureFullyDisplayed )
 {
   QgsRectangle current = extent();
 
@@ -1490,6 +1490,11 @@ void QgsMapCanvas::setExtent( const QgsRectangle &r, bool magnified )
   }
   else
   {
+    QgsRectangle newExtent = r;
+    if ( ensureFullyDisplayed )
+    {
+      newExtent = computeExtentForRotation( r, rotation() );
+    }
     // If scale is locked we need to maintain the current scale, so we
     // - magnify and recenter the map
     // - restore locked scale
@@ -1497,15 +1502,15 @@ void QgsMapCanvas::setExtent( const QgsRectangle &r, bool magnified )
     {
       ScaleRestorer restorer( this );
       const double ratio { mapSettings().extent().width() / mapSettings().extent().height() };
-      const double factor { r.width() / r.height() > ratio ? mapSettings().extent().width() / r.width() :  mapSettings().extent().height() / r.height() };
+      const double factor { newExtent.width() / newExtent.height() > ratio ? mapSettings().extent().width() / newExtent.width() :  mapSettings().extent().height() / newExtent.height() };
       const double scaleFactor { std::clamp( mSettings.magnificationFactor() * factor, QgsGuiUtils::CANVAS_MAGNIFICATION_MIN, QgsGuiUtils::CANVAS_MAGNIFICATION_MAX ) };
-      const QgsPointXY newCenter { r.center() };
+      const QgsPointXY newCenter { newExtent.center() };
       mSettings.setMagnificationFactor( scaleFactor, &newCenter );
       emit magnificationChanged( scaleFactor );
     }
     else
     {
-      mSettings.setExtent( r, magnified );
+      mSettings.setExtent( newExtent, magnified );
     }
   }
   emitExtentsChanged();
@@ -1551,7 +1556,7 @@ bool QgsMapCanvas::setReferencedExtent( const QgsReferencedRectangle &extent )
     }
   }
 
-  setExtent( canvasExtent, true );
+  setExtent( canvasExtent, true, true );
   return true;
 }
 
@@ -1612,7 +1617,7 @@ void QgsMapCanvas::zoomToFullExtent()
   {
     // Add a 5% margin around the full extent
     extent.scale( 1.05 );
-    setExtent( extent, true );
+    setExtent( extent, true, true );
   }
   refresh();
 }
@@ -1626,7 +1631,7 @@ void QgsMapCanvas::zoomToProjectExtent()
   {
     // Add a 5% margin around the full extent
     extent.scale( 1.05 );
-    setExtent( extent, true );
+    setExtent( extent, true, true );
   }
   refresh();
 }
@@ -1905,7 +1910,7 @@ void QgsMapCanvas::zoomToFeatureExtent( QgsRectangle &rect )
     rect.scale( 1.05 );
   }
 
-  setExtent( rect, true );
+  setExtent( rect, true, true );
   refresh();
 }
 
@@ -2249,7 +2254,7 @@ void QgsMapCanvas::keyPressEvent( QKeyEvent *e )
         return;
     }
 
-    QgsRectangle currentExtent = mapSettings().visibleExtent();
+    QgsRectangle currentExtent = extent();
     double dx = std::fabs( currentExtent.width() / 4 );
     double dy = std::fabs( currentExtent.height() / 4 );
 
@@ -2649,13 +2654,13 @@ void QgsMapCanvas::setWheelFactor( double factor )
 
 void QgsMapCanvas::zoomIn()
 {
-  // magnification is alreday handled in zoomByFactor
+  // magnification is already handled in zoomByFactor
   zoomByFactor( zoomInFactor() );
 }
 
 void QgsMapCanvas::zoomOut()
 {
-  // magnification is alreday handled in zoomByFactor
+  // magnification is already handled in zoomByFactor
   zoomByFactor( zoomOutFactor() );
 }
 
@@ -3477,7 +3482,7 @@ void QgsMapCanvas::startPreviewJobs()
 
 void QgsMapCanvas::startPreviewJob( int number )
 {
-  QgsRectangle mapRect = mSettings.visibleExtent();
+  QgsRectangle mapRect = extent();
 
   if ( number == 4 )
     number += 1;
@@ -3637,4 +3642,38 @@ double QgsMapCanvas::zoomOutFactor() const
     }
   }
   return mWheelZoomFactor;
+}
+
+QgsRectangle QgsMapCanvas::computeExtentForRotation( const QgsRectangle &extent, double rotation ) const
+{
+  if ( extent.isEmpty() || qgsDoubleNear( rotation, 0.0 ) )
+  {
+    return extent;
+  }
+
+  // Compute the dimensions of the Oriented Bounding Box (OBB) of the extent
+  const double radians = rotation * M_PI / 180.0;
+  const double s = abs( sin( radians ) );
+  const double c = abs( cos( radians ) );
+  const double oob_h = s * extent.width() + c * extent.height();
+  const double oob_w = s * extent.height() + c * extent.width();
+
+  // Match the OBB dimensions to the canvas aspect ratio
+  const double canvas_h = height();
+  const double canvas_w = width();
+  double new_h, new_w;
+  if ( oob_h / oob_w > canvas_h / canvas_w )
+  {
+    new_h = oob_h;
+    new_w = oob_h * canvas_w / canvas_h;
+  }
+  else
+  {
+    new_w = oob_w;
+    new_h = oob_w * canvas_h / canvas_w;
+  }
+
+  const double cx = extent.center().x();
+  const double cy = extent.center().y();
+  return QgsRectangle( cx - new_w / 2, cy - new_h / 2, cx + new_w / 2, cy + new_h / 2 );
 }

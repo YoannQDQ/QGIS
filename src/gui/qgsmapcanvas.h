@@ -315,8 +315,11 @@ class GUI_EXPORT QgsMapCanvas : public QGraphicsView, public QgsExpressionContex
      *
      * If \a magnified is FALSE then scale lock settings will be ignored, and the specified
      * rectangle will ALWAYS be visible in the canvas.
+     *
+     * If \a ensureFullyDisplayed is true, compute the actual extent needed to fit the extent
+     * in the rotated canvas \see computeExtentForRotation() \since 3.32
      */
-    void setExtent( const QgsRectangle &r, bool magnified = false );
+    void setExtent( const QgsRectangle &r, bool magnified = false, bool ensureFullyDisplayed = false );
 
     /**
      * Sets the canvas to the specified \a extent.
@@ -902,6 +905,13 @@ class GUI_EXPORT QgsMapCanvas : public QGraphicsView, public QgsExpressionContex
      * \since QGIS 3.34
      */
     void setMapController( QgsAbstract2DMapController *controller SIP_TRANSFER );
+
+    /**
+     * Compute the actual extent needed to fully display the \a extent rotated by \a rotation.
+     *
+     * \since QGIS 3.32
+     */
+    QgsRectangle computeExtentForRotation( const QgsRectangle &extent, double rotation ) const;
 
   public slots:
 

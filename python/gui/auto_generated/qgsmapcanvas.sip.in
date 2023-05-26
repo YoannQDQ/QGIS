@@ -248,7 +248,7 @@ Unlike :py:func:`~QgsMapCanvas.fullExtent`, this method does NOT consider which 
 .. versionadded:: 3.20
 %End
 
-    void setExtent( const QgsRectangle &r, bool magnified = false );
+    void setExtent( const QgsRectangle &r, bool magnified = false, bool ensureFullyDisplayed = false );
 %Docstring
 Sets the extent of the map canvas to the specified rectangle.
 
@@ -259,6 +259,10 @@ visible canvas extent may not match the specified extent.
 
 If ``magnified`` is ``False`` then scale lock settings will be ignored, and the specified
 rectangle will ALWAYS be visible in the canvas.
+
+If ``ensureFullyDisplayed`` is true, compute the actual extent needed to fit the extent
+
+.. versionadded:: 3.32
 %End
 
     bool setReferencedExtent( const QgsReferencedRectangle &extent ) throw( QgsCsException );
@@ -942,6 +946,13 @@ Sets the input controller device to use for controlling the canvas.
 Ownership of ``controller`` is transferred to the canvas.
 
 .. versionadded:: 3.34
+%End
+
+    QgsRectangle computeExtentForRotation( const QgsRectangle &extent, double rotation ) const;
+%Docstring
+Compute the actual extent needed to fully display the ``extent`` rotated by ``rotation``.
+
+.. versionadded:: 3.32
 %End
 
   public slots:
