@@ -1905,7 +1905,7 @@ void QgsMapCanvas::zoomToFeatureExtent( QgsRectangle &rect )
     rect.scale( 1.05 );
   }
 
-  setExtent( rect );
+  setExtent( rect, true );
   refresh();
 }
 
