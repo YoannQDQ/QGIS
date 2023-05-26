@@ -914,13 +914,17 @@ bool QgsBookmarkDropHandler::handleCustomUriCanvasDrop( const QgsMimeDataUtils::
 
   try
   {
+    // Rotation must be set before extent, otherwise the map canvas is not ensured
+    // to fully display the extent
+    const double oldRotation = canvas->rotation();
+    canvas->setRotation( b.rotation() );
     if ( ! canvas->setReferencedExtent( b.extent() ) )
     {
+      canvas->setRotation( oldRotation );
       QgisApp::instance()->messageBar()->pushWarning( tr( "Zoom to Bookmark" ), tr( "Bookmark extent is empty" ) );
     }
     else
     {
-      canvas->setRotation( b.rotation() );
       canvas->refresh();
     }
   }

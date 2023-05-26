@@ -203,13 +203,18 @@ void QgsBookmarks::zoomToBookmarkIndex( const QModelIndex &index )
   const QgsReferencedRectangle rect = index.data( QgsBookmarkManagerModel::RoleExtent ).value< QgsReferencedRectangle >();
   try
   {
+    // Rotation must be set before extent, otherwise the map canvas is not ensured
+    // to fully display the extent
+    const double oldRotation = QgisApp::instance()->mapCanvas()->rotation();
+    QgisApp::instance()->mapCanvas()->setRotation( index.data( QgsBookmarkManagerModel::RoleRotation ).toDouble() );
+
     if ( QgisApp::instance()->mapCanvas()->setReferencedExtent( rect ) )
     {
-      QgisApp::instance()->mapCanvas()->setRotation( index.data( QgsBookmarkManagerModel::RoleRotation ).toDouble() );
       QgisApp::instance()->mapCanvas()->refresh();
     }
     else
     {
+      QgisApp::instance()->mapCanvas()->setRotation( oldRotation );
       QgisApp::instance()->messageBar()->pushWarning( tr( "Zoom to Bookmark" ), tr( "Bookmark extent is empty" ) );
     }
   }
