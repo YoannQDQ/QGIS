@@ -570,6 +570,44 @@ class QTreeWidgetItem;
 class QgsUserProfileManager;
 class QgsUserProfile;
 
+
+
+class TestAction: public QWidgetAction
+{
+  public:
+    TestAction( QObject *parent = nullptr ): QWidgetAction( parent ) {};
+    virtual QToolButton *createToolButton() = 0;
+
+    QWidget *createWidget( QWidget *parent )
+    {
+      auto widget = createToolButton();
+      widget->setParent( parent );
+      if ( dynamic_cast<QMenu *>( parent ) )
+      {
+
+        widget->setText( QStringLiteral( " " ) + widget->text() );
+        widget->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+      }
+      return widget;
+    }
+};
+
+class MapThemeAction: public TestAction
+{
+  public:
+    MapThemeAction( QObject *parent = nullptr ): TestAction( parent ) {};
+    QToolButton *createToolButton() override
+    {
+      QToolButton *btnVisibilityPresets = new QToolButton();
+      btnVisibilityPresets->setAutoRaise( true );
+      btnVisibilityPresets->setText( tr( "Manage Map Themes" ) );
+      btnVisibilityPresets->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ) );
+      btnVisibilityPresets->setPopupMode( QToolButton::InstantPopup );
+      btnVisibilityPresets->setMenu( QgsMapThemes::instance()->menu() );
+      return btnVisibilityPresets;
+    }
+};
+
 /**
  * Set the application title bar text
  */
@@ -4958,7 +4996,7 @@ void QgisApp::initLayerTreeView()
   toolbar->setIconSize( iconSize( true ) );
   toolbar->addAction( mActionStyleDock );
   toolbar->addAction( actionAddGroup );
-  toolbar->addWidget( btnVisibilityPresets );
+  toolbar->addAction( new MapThemeAction(toolbar) );
   toolbar->addWidget( mFilterLegendToolButton );
   toolbar->addWidget( mLegendExpressionFilterButton );
   toolbar->addAction( actionExpandAll );
