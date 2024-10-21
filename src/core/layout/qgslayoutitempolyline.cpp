@@ -137,6 +137,7 @@ void QgsLayoutItemPolyline::drawStartMarker( QPainter *painter )
       const QLineF startLine( mPolygon.at( 0 ), mPolygon.at( 1 ) );
       const double angle = startLine.angle();
       drawArrow( painter, mPolygon.at( 0 ), angle );
+      // drawSvgMarker( painter, startLine.p1(), angle, QStringLiteral("/home/yoann/Downloads/arrows/arrow_3.svg"), mStartArrowHeadHeight );
       break;
     }
 
@@ -172,7 +173,7 @@ void QgsLayoutItemPolyline::drawEndMarker( QPainter *painter )
       const QVector2D dir = QVector2D( endLine.dx(), endLine.dy() ).normalized();
       QPointF endPoint = endLine.p2();
       endPoint += ( dir * 0.5 * mArrowHeadWidth ).toPointF();
-
+      // drawSvgMarker( painter, endLine.p2(), angle, QStringLiteral("/home/yoann/Downloads/arrows/arrow_3.svg"), mEndArrowHeadHeight );
       drawArrow( painter, endPoint, angle );
       break;
     }
