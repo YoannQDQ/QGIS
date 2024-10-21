@@ -385,6 +385,7 @@ void QgsLayoutGuiUtils::registerGuiForKnownItemTypes( QgsMapCanvas *mapCanvas )
   arrowMetadata->setItemCreationFunction( []( QgsLayout *layout ) -> QgsLayoutItem * {
     std::unique_ptr<QgsLayoutItemPolyline> arrow = std::make_unique<QgsLayoutItemPolyline>( layout );
     arrow->setEndMarker( QgsLayoutItemPolyline::ArrowHead );
+    arrow->setArrowHeadStrokeWidth( 0 );
     return arrow.release();
   } );
   arrowMetadata->setNodeRubberBandCreationFunction( []( QgsLayoutView * ) -> QGraphicsItemGroup * {
