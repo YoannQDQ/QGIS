@@ -92,6 +92,10 @@ void QgsLayoutGuide::update()
       else
       {
         mLineItem->setLine( 0, layoutPos + mPage->y(), mPage->rect().width(), layoutPos + mPage->y() );
+        QPen pen( mLineItem->pen() );
+        pen.setColor( mSelected ? Qt::blue : Qt::red );
+        pen.setStyle  ( mSelected ? Qt::SolidLine : Qt::DotLine );
+        mLineItem->setPen( pen );
         mLineItem->setVisible( showGuide );
       }
 
@@ -105,6 +109,10 @@ void QgsLayoutGuide::update()
       else
       {
         mLineItem->setLine( layoutPos, mPage->y(), layoutPos, mPage->y() + mPage->rect().height() );
+        QPen pen( mLineItem->pen() );
+        pen.setColor( mSelected ? Qt::blue : Qt::red );
+        pen.setStyle  ( mSelected ? Qt::SolidLine : Qt::DotLine );
+        mLineItem->setPen( pen );
         mLineItem->setVisible( showGuide );
       }
 
@@ -152,6 +160,19 @@ void QgsLayoutGuide::setLayoutPosition( double position )
   mPosition = mLayout->convertFromLayoutUnits( p, mPosition.units() );
   update();
   emit positionChanged();
+}
+
+bool QgsLayoutGuide::selected() const
+{
+  return mSelected;
+}
+void QgsLayoutGuide::setSelected( bool selected )
+{
+  if( mSelected != selected )
+  {
+    mSelected = selected;
+    update();
+  }
 }
 
 QgsLayout *QgsLayoutGuide::layout() const
@@ -587,6 +608,31 @@ bool QgsLayoutGuideCollection::readXml( const QDomElement &e, const QDomDocument
   endResetModel();
   mBlockUndoCommands = false;
   return true;
+}
+
+
+QList<int>  QgsLayoutGuideCollection::selectedGuides() const
+{
+  return mSelectedGuides;
+}
+
+void QgsLayoutGuideCollection::setSelectedGuides( const QList<int> &guides )
+{
+  QList<int> updatedGuides;
+
+  for( int guide : mSelectedGuides )
+    if ( !guides.contains( guide ) )
+        updatedGuides << guide;
+
+  for( int guide : guides )
+    if ( !mSelectedGuides.contains( guide ) )
+        updatedGuides << guide;
+
+  mSelectedGuides = guides;
+
+  for ( int guide : updatedGuides )
+    if (guide>=0 && guide< mGuides.size())
+      mGuides.at( guide )->setSelected( mSelectedGuides.contains( guide ) );
 }
 
 //
