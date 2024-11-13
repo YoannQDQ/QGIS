@@ -63,7 +63,15 @@ QgsLayoutGuideWidget::QgsLayoutGuideWidget( QWidget *parent, QgsLayout *layout, 
   } );
 
   connect( layoutView, &QgsLayoutView::pageChanged, this, &QgsLayoutGuideWidget::setCurrentPage );
+
+  connect( mHozGuidesTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsLayoutGuideWidget::onSelectionChanged );
+  connect( mVertGuidesTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsLayoutGuideWidget::onSelectionChanged );
+
   setCurrentPage( 0 );
+
+  mVertGuidesTableView->installEventFilter(this);
+  mVertGuidesTableView->viewport()->installEventFilter(this);
+  
 }
 
 void QgsLayoutGuideWidget::addHorizontalGuide()
@@ -128,6 +136,24 @@ void QgsLayoutGuideWidget::setCurrentPage( int page )
   whileBlocking( mPageNumberComboBox )->setCurrentIndex( page );
 }
 
+
+
+bool QgsLayoutGuideWidget::eventFilter( QObject *watched, QEvent *event )
+{
+  switch ( event->type() )
+  {
+    case QEvent::FocusIn:
+      qInfo() << watched << "FocusIn";
+      break;
+    case QEvent::FocusOut:
+      qInfo() << watched << "FocusOut";
+      break;
+    default:
+      break;
+  }
+  return false;
+}
+
 void QgsLayoutGuideWidget::clearAll()
 {
   // qt - y u no do this for me?
@@ -162,6 +188,28 @@ void QgsLayoutGuideWidget::updatePageCount()
 
   if ( mPageNumberComboBox->count() > prevPage )
     mPageNumberComboBox->setCurrentIndex( prevPage );
+}
+
+void QgsLayoutGuideWidget::onSelectionChanged()
+{  
+  QSet<int> selectedGuides;
+  if ( sender() == mHozGuidesTableView->selectionModel() )
+  {
+    QModelIndexList selectedIndexes = mHozGuidesTableView->selectionModel()->selectedIndexes();
+    for ( const QModelIndex &index : selectedIndexes )
+    {
+      selectedGuides << mHozProxyModel->mapToSource( index ).row();
+    }
+  }
+  else if ( sender() == mVertGuidesTableView->selectionModel() )
+  {
+    QModelIndexList selectedIndexes = mVertGuidesTableView->selectionModel()->selectedIndexes();
+    for ( const QModelIndex &index : selectedIndexes )
+    {
+      selectedGuides << mVertProxyModel->mapToSource( index ).row();
+    }
+  }
+  mLayout->guides().setSelectedGuides( selectedGuides.values() );
 }
 
 

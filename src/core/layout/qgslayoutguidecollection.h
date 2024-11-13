@@ -134,6 +134,9 @@ class CORE_EXPORT QgsLayoutGuide : public QObject
      */
     void setLayoutPosition( double position );
 
+    bool selected() const;
+    void setSelected( bool selected );
+
   signals:
 
     /**
@@ -155,6 +158,8 @@ class CORE_EXPORT QgsLayoutGuide : public QObject
 
     //! Line item used in scene for guide
     QGraphicsLineItem *mLineItem = nullptr;
+
+    bool mSelected = false;
 
 };
 
@@ -287,6 +292,10 @@ class CORE_EXPORT QgsLayoutGuideCollection : public QAbstractTableModel, public 
      */
     bool readXml( const QDomElement &collectionElement, const QDomDocument &document, const QgsReadWriteContext &context ) override;
 
+
+    QList<int> selectedGuides() const;
+    void setSelectedGuides( const QList<int> &guides );
+
   private slots:
 
     void pageAboutToBeRemoved( int pageNumber );
@@ -307,6 +316,8 @@ class CORE_EXPORT QgsLayoutGuideCollection : public QAbstractTableModel, public 
 
     bool mGuidesVisible = true;
     bool mBlockUndoCommands = false;
+
+    QList<int> mSelectedGuides;
 
     friend class QgsLayoutGuideCollectionUndoCommand;
 
