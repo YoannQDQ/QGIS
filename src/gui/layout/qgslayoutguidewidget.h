@@ -44,12 +44,17 @@ class GUI_EXPORT QgsLayoutGuideWidget : public QgsPanelWidget, private Ui::QgsLa
     //! constructor
     QgsLayoutGuideWidget( QWidget *parent, QgsLayout *layout, QgsLayoutView *layoutView );
 
+
+
   public slots:
 
     /**
      * Sets the current page number to manage the guides for.
      */
     void setCurrentPage( int page );
+  
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
 
   private slots:
 
@@ -64,6 +69,8 @@ class GUI_EXPORT QgsLayoutGuideWidget : public QgsPanelWidget, private Ui::QgsLa
     void applyToAll();
 
     void updatePageCount();
+    
+    void onSelectionChanged();
 
   private:
     QgsLayout *mLayout = nullptr;
