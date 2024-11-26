@@ -18,6 +18,8 @@
 
 #include <QTransform>
 
+#define INCH_TO_MM 25.4
+
 Q_GUI_EXPORT extern int qt_defaultDpiX();
 Q_GUI_EXPORT extern int qt_defaultDpiY();
 
@@ -254,4 +256,9 @@ void QgsPainting::drawPicture( QPainter *painter, const QPointF &point, const QP
   painter->scale( xScale, yScale );
   painter->drawPicture( QPointF( point.x() / xScale, point.y() / yScale ), picture );
   painter->scale( 1 / xScale, 1 / yScale );
+}
+
+double QgsPainting::pixelsPerMm( int dpi )
+{
+  return ( dpi < 0 ? qtDefaultDpiX() : dpi ) / INCH_TO_MM;
 }

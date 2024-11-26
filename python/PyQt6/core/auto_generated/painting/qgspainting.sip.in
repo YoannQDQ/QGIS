@@ -147,6 +147,17 @@ avoid issues with incorrect scaling.
 
 .. versionadded:: 3.40
 %End
+
+
+    static double pixelsPerMm( int dpi = -1 );
+%Docstring
+Return the number of pixels per millimeter, at the given DPI.
+If dpi is -1, the default DPI (qtDefaultDpiX) is used.
+
+.. seealso:: :py:func:`qtDefaultDpiX`
+
+.. versionadded:: 3.42
+%End
 };
 
 /************************************************************************
