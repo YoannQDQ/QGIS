@@ -139,6 +139,16 @@ class CORE_EXPORT QgsPainting
      * \since QGIS 3.40
      */
     static void drawPicture( QPainter *painter, const QPointF &point, const QPicture &picture );
+
+
+    /**
+     * Return the number of pixels per millimeter, at the given DPI.
+     * If dpi is -1, the default DPI (qtDefaultDpiX) is used.
+     *
+     * \see qtDefaultDpiX
+     * \since QGIS 3.42
+     */
+    static double pixelsPerMm( int dpi = -1 );
 };
 
 #endif // QGSPAINTING_H
