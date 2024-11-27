@@ -21,6 +21,7 @@
 #include "qgslayoutitempage.h"
 #include "qgslayoutmousehandles.h"
 #include "qgslayoutitemgroup.h"
+#include "qgspainting.h"
 
 
 const double QgsLayoutViewToolSelect::sSearchToleranceInMillimeters = 2.0;
@@ -348,7 +349,7 @@ void QgsLayoutViewToolSelect::setLayout( QgsLayout *layout )
 }
 double QgsLayoutViewToolSelect::searchToleranceInLayoutUnits()
 {
-  const double pixelsPerMm = view()->physicalDpiX() / 25.4;
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( view()->physicalDpiX() );
   return sSearchToleranceInMillimeters * pixelsPerMm / view()->transform().m11();
 }
 ///@endcond

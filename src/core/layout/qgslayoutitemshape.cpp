@@ -23,6 +23,7 @@
 #include "qgsstyleentityvisitor.h"
 #include "qgsfillsymbol.h"
 #include "qgslayoutrendercontext.h"
+#include "qgspainting.h"
 
 #include <QPainter>
 
@@ -127,7 +128,8 @@ void QgsLayoutItemShape::refreshSymbol( bool redraw )
   if ( auto *lLayout = layout() )
   {
     const QgsRenderContext rc = QgsLayoutUtils::createRenderContextForLayout( lLayout, nullptr, lLayout->renderContext().dpi() );
-    mMaxSymbolBleed = ( 25.4 / lLayout->renderContext().dpi() ) * QgsSymbolLayerUtils::estimateMaxSymbolBleed( mShapeStyleSymbol.get(), rc );
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( lLayout->renderContext().dpi() );
+    mMaxSymbolBleed = QgsSymbolLayerUtils::estimateMaxSymbolBleed( mShapeStyleSymbol.get(), rc ) / pixelsPerMm;
   }
 
   updateBoundingRect();
