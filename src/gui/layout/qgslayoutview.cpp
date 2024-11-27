@@ -34,6 +34,7 @@
 #include "qgslayoutreportsectionlabel.h"
 #include "qgsreadwritecontext.h"
 #include "qgsscreenhelper.h"
+#include "qgspainting.h"
 #include "moc_qgslayoutview.cpp"
 
 #include <memory>
@@ -207,11 +208,11 @@ void QgsLayoutView::setZoomLevel( double level )
   }
   else
   {
-    const double dpi = mScreenHelper->screenDpi();
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( mScreenHelper->screenDpi() );
 
-    //desired pixel width for 1mm on screen
+    // desired pixel width for 1mm on screen
     level = std::clamp( level, MIN_VIEW_SCALE, MAX_VIEW_SCALE );
-    double mmLevel = currentLayout()->convertFromLayoutUnits( level, Qgis::LayoutUnit::Millimeters ).length() * dpi / 25.4;
+    double mmLevel = currentLayout()->convertFromLayoutUnits( level, Qgis::LayoutUnit::Millimeters ).length() * pixelsPerMm;
     setTransform( QTransform::fromScale( mmLevel, mmLevel ) );
   }
   emit zoomLevelChanged();

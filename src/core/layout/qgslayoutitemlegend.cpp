@@ -40,6 +40,7 @@
 #include "qgslayoutreportcontext.h"
 #include "qgslayertreefiltersettings.h"
 #include "qgsreferencedgeometry.h"
+#include "qgspainting.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -118,7 +119,7 @@ void QgsLayoutItemLegend::paint( QPainter *painter, const QStyleOptionGraphicsIt
   }
 
   const int dpi = painter->device()->logicalDpiX();
-  const double dotsPerMM = dpi / 25.4;
+  const double dotsPerMM = QgsPainting::pixelsPerMm( dpi );
 
   if ( mLayout )
   {
@@ -1177,6 +1178,7 @@ void QgsLayoutItemLegend::doUpdateFilterByMap()
   if ( hasValidFilter )
   {
     const double dpi = mLayout->renderContext().dpi();
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( dpi );
 
     QSet< QgsLayoutItemMap * > linkedFilterMaps;
     if ( mLegendFilterByMap )
@@ -1193,7 +1195,7 @@ void QgsLayoutItemLegend::doUpdateFilterByMap()
       // if a specific linked map has been set, use it for the reference scale and extent
       const QgsRectangle requestRectangle = mMap->requestedExtent();
       QSizeF size( requestRectangle.width(), requestRectangle.height() );
-      size *= mLayout->convertFromLayoutUnits( mMap->mapUnitsToLayoutUnits(), Qgis::LayoutUnit::Millimeters ).length() * dpi / 25.4;
+      size *= mLayout->convertFromLayoutUnits( mMap->mapUnitsToLayoutUnits(), Qgis::LayoutUnit::Millimeters ).length() * pixelsPerMm;
       mapSettings = mMap->mapSettings( requestRectangle, size, dpi, true );
 
       filterGeometry = QgsGeometry::fromQPolygonF( mMap->visibleExtentPolygon() );
@@ -1203,7 +1205,7 @@ void QgsLayoutItemLegend::doUpdateFilterByMap()
       // otherwise just take the first linked filter map
       const QgsRectangle requestRectangle = ( *linkedFilterMaps.constBegin() )->requestedExtent();
       QSizeF size( requestRectangle.width(), requestRectangle.height() );
-      size *= mLayout->convertFromLayoutUnits( ( *linkedFilterMaps.constBegin() )->mapUnitsToLayoutUnits(), Qgis::LayoutUnit::Millimeters ).length() * dpi / 25.4;
+      size *= mLayout->convertFromLayoutUnits( ( *linkedFilterMaps.constBegin() )->mapUnitsToLayoutUnits(), Qgis::LayoutUnit::Millimeters ).length() * pixelsPerMm;
       mapSettings = ( *linkedFilterMaps.constBegin() )->mapSettings( requestRectangle, size, dpi, true );
 
       filterGeometry = QgsGeometry::fromQPolygonF( ( *linkedFilterMaps.constBegin() )->visibleExtentPolygon() );
