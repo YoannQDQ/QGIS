@@ -32,6 +32,7 @@
 #include "qgslayout.h"
 #include "qgslayoutrendercontext.h"
 #include "qgslayoutreportcontext.h"
+#include "qgspainting.h"
 
 #include <QCoreApplication>
 #include <QDate>
@@ -107,8 +108,7 @@ void QgsLayoutItemLabel::draw( QgsLayoutItemRenderContext &context )
   }
   else
   {
-    // The 3.77 adjustment value was found through trial and error, the author has however no clue as to where it comes from
-    const double adjustmentFactor = 3.77;
+    const double adjustmentFactor = QgsPainting::pixelsPerMm();
     const double rectScale = context.renderContext().scaleFactor() * adjustmentFactor;
     // The left/right margin is handled by the stylesheet while the top/bottom margin is ignored by QTextDocument
     painterRect = QRectF( 0, 0,

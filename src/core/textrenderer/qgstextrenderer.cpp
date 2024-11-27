@@ -1888,7 +1888,7 @@ QBrush QgsTextRenderer::createBrushForPath( QgsRenderContext &context, const QSt
   // use original image size
   const QSize imageSize = QgsApplication::imageCache()->originalSize( path, context.flags() & Qgis::RenderContextFlag::RenderBlocking );
   // TODO: maybe there's more optimal logic we could use here, but for now we assume 96dpi image resolution...
-  const QSizeF originalSizeMmAt96Dpi = imageSize / 3.7795275590551185;
+  const QSizeF originalSizeMmAt96Dpi = imageSize / QgsPainting::pixelsPerMm( 96 );
   const double pixelsPerMm = context.scaleFactor();
   const double imageWidth = originalSizeMmAt96Dpi.width() * pixelsPerMm;
   const double imageHeight = originalSizeMmAt96Dpi.height() * pixelsPerMm;

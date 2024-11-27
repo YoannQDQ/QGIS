@@ -34,6 +34,7 @@
 #include "qgsreadwritecontext.h"
 #include "qgsimagecache.h"
 #include "qgslayoutnortharrowhandler.h"
+#include "qgspainting.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -124,8 +125,9 @@ void QgsLayoutItemPicture::draw( QgsLayoutItemRenderContext &context )
     {
       boundRectWidthMM = rect().width();
       boundRectHeightMM = rect().height();
-      imageRect = QRect( 0, 0, mLayout->convertFromLayoutUnits( rect().width(), Qgis::LayoutUnit::Millimeters ).length() * mLayout->renderContext().dpi() / 25.4,
-                         mLayout->convertFromLayoutUnits( rect().height(), Qgis::LayoutUnit::Millimeters ).length() * mLayout->renderContext().dpi() / 25.4 );
+      const double pixelsPerMm = QgsPainting::pixelsPerMm( mLayout->renderContext().dpi() );
+      imageRect = QRect( 0, 0, mLayout->convertFromLayoutUnits( rect().width(), Qgis::LayoutUnit::Millimeters ).length() * pixelsPerMm,
+                         mLayout->convertFromLayoutUnits( rect().height(), Qgis::LayoutUnit::Millimeters ).length() * pixelsPerMm );
     }
 
     //zoom mode - calculate anchor point and rotation
@@ -252,8 +254,9 @@ QSizeF QgsLayoutItemPicture::applyItemSizeConstraint( const QSizeF targetSize )
       if ( !( currentPictureSize.isEmpty() ) )
       {
         const QgsLayoutSize sizeMM = mLayout->convertFromLayoutUnits( currentPictureSize, Qgis::LayoutUnit::Millimeters );
-        newSize.setWidth( sizeMM.width() * 25.4 / mLayout->renderContext().dpi() );
-        newSize.setHeight( sizeMM.height() * 25.4 / mLayout->renderContext().dpi() );
+        const double pixelsPerMm = QgsPainting::pixelsPerMm( mLayout->renderContext().dpi() );
+        newSize.setWidth( sizeMM.width() * pixelsPerMm );
+        newSize.setHeight( sizeMM.height() * pixelsPerMm );
       }
     }
 
@@ -282,12 +285,13 @@ QSizeF QgsLayoutItemPicture::applyItemSizeConstraint( const QSizeF targetSize )
 
 QRect QgsLayoutItemPicture::clippedImageRect( double &boundRectWidthMM, double &boundRectHeightMM, QSize imageRectPixels )
 {
-  const int boundRectWidthPixels = boundRectWidthMM * mLayout->renderContext().dpi() / 25.4;
-  const int boundRectHeightPixels = boundRectHeightMM * mLayout->renderContext().dpi() / 25.4;
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( mLayout->renderContext().dpi() );
+  const int boundRectWidthPixels = boundRectWidthMM * pixelsPerMm;
+  const int boundRectHeightPixels = boundRectHeightMM * pixelsPerMm;
 
   //update boundRectWidth/Height so that they exactly match pixel bounds
-  boundRectWidthMM = boundRectWidthPixels * 25.4 / mLayout->renderContext().dpi();
-  boundRectHeightMM = boundRectHeightPixels * 25.4 / mLayout->renderContext().dpi();
+  boundRectWidthMM = boundRectWidthPixels / pixelsPerMm;
+  boundRectHeightMM = boundRectHeightPixels / pixelsPerMm;
 
   //calculate part of image which fits in bounds
   int leftClip = 0;

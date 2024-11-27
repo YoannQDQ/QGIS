@@ -27,6 +27,7 @@
 #include "qgssvgcache.h"
 #include "qgsstyleentityvisitor.h"
 #include "qgslinesymbol.h"
+#include "qgspainting.h"
 
 #include <QSvgRenderer>
 #include <limits>
@@ -113,7 +114,8 @@ void QgsLayoutItemPolyline::refreshSymbol()
   if ( auto *lLayout = layout() )
   {
     const QgsRenderContext rc = QgsLayoutUtils::createRenderContextForLayout( lLayout, nullptr, lLayout->renderContext().dpi() );
-    mMaxSymbolBleed = ( 25.4 / lLayout->renderContext().dpi() ) * QgsSymbolLayerUtils::estimateMaxSymbolBleed( mPolylineStyleSymbol.get(), rc );
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( lLayout->renderContext().dpi() );
+    mMaxSymbolBleed = QgsSymbolLayerUtils::estimateMaxSymbolBleed( mPolylineStyleSymbol.get(), rc ) / pixelsPerMm;
   }
 
   updateSceneRect();

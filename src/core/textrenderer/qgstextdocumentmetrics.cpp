@@ -23,6 +23,7 @@
 #include "qgstextrenderer.h"
 #include "qgsapplication.h"
 #include "qgsimagecache.h"
+#include "qgspainting.h"
 
 #include <QFontMetricsF>
 
@@ -409,7 +410,7 @@ void QgsTextDocumentMetrics::processFragment( QgsTextDocumentMetrics &res, const
         // use original image size
         const QSize imageSize = QgsApplication::imageCache()->originalSize( fragmentFormat.imagePath(), context.flags() & Qgis::RenderContextFlag::RenderBlocking );
         // TODO: maybe there's more optimal logic we could use here, but for now we assume 96dpi image resolution...
-        const QSizeF originalSizeMmAt96Dpi = imageSize / 3.7795275590551185;
+        const QSizeF originalSizeMmAt96Dpi = imageSize / QgsPainting::pixelsPerMm( 96 );
         const double pixelsPerMm = context.scaleFactor();
         imageWidth = originalSizeMmAt96Dpi.width() * pixelsPerMm;
         imageHeight = originalSizeMmAt96Dpi.height() * pixelsPerMm;

@@ -65,8 +65,7 @@ void QgsFormAnnotation::setDesignerForm( const QString &uiFile )
       newFill->setColor( mDesignerWidget->palette().color( QPalette::Window ) );
       setFillSymbol( newFill );
     }
-    // convert from size in pixels at 96 dpi to mm
-    setFrameSizeMm( preferredFrameSize() / 3.7795275 );
+    setFrameSize( preferredFrameSize() );
   }
   emit appearanceChanged();
 }
