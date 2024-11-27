@@ -76,6 +76,7 @@
 #include "qgsscreenhelper.h"
 #include "qgsshortcutsmanager.h"
 #include "qgsconfigureshortcutsdialog.h"
+#include "qgspainting.h"
 #include "ui_defaults.h"
 
 #include <QShortcut>
@@ -1806,10 +1807,8 @@ void QgsLayoutDesignerDialog::updateStatusZoom()
   }
   else
   {
-    const double dpi = mScreenHelper->screenDpi();
-
     //pixel width for 1mm on screen
-    double scale100 = dpi / 25.4;
+    double scale100 = QgsPainting::pixelsPerMm( mScreenHelper->screenDpi() );
     scale100 = currentLayout()->convertFromLayoutUnits( scale100, Qgis::LayoutUnit::Millimeters ).length();
     //current zoomLevel
     zoomLevel = mView->transform().m11() * 100 / scale100;

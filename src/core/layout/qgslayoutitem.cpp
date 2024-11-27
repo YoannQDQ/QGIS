@@ -319,7 +319,7 @@ void QgsLayoutItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *it
     }
     else
     {
-      const double layoutUnitsToPixels = mLayout ? mLayout->convertFromLayoutUnits( 1, Qgis::LayoutUnit::Pixels ).length() : destinationDpi / 25.4;
+      const double layoutUnitsToPixels = mLayout ? mLayout->convertFromLayoutUnits( 1, Qgis::LayoutUnit::Pixels ).length() : QgsPainting::pixelsPerMm( destinationDpi );
       widthInPixels = boundingRect().width() * layoutUnitsToPixels;
       heightInPixels = boundingRect().height() * layoutUnitsToPixels;
     }
@@ -360,8 +360,9 @@ void QgsLayoutItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *it
     {
       QImage image = QImage( widthInPixels, heightInPixels, QImage::Format_ARGB32 );
       image.fill( Qt::transparent );
-      image.setDotsPerMeterX( 1000 * destinationDpi * 25.4 );
-      image.setDotsPerMeterY( 1000 * destinationDpi * 25.4 );
+      const double pixelsPerMm = QgsPainting::pixelsPerMm( destinationDpi );
+      image.setDotsPerMeterX( 1000 * pixelsPerMm );
+      image.setDotsPerMeterY( 1000 * pixelsPerMm );
       QPainter p( &image );
 
       preparePainter( &p );
