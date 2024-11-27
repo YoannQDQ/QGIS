@@ -40,6 +40,7 @@
 #include "qgslabelingresults.h"
 #include "qgsvectortileutils.h"
 #include "qgsunittypes.h"
+#include "qgspainting.h"
 
 #include <QApplication>
 #include <QPainter>
@@ -1211,9 +1212,9 @@ void QgsLayoutItemMap::paint( QPainter *painter, const QStyleOptionGraphicsItem 
       QImage image = QImage( widthInPixels, heightInPixels, QImage::Format_ARGB32 );
 
       image.fill( Qt::transparent );
-      image.setDotsPerMeterX( static_cast< int >( std::round( 1000 * destinationDpi / 25.4 ) ) );
-      image.setDotsPerMeterY( static_cast< int >( std::round( 1000 * destinationDpi / 25.4 ) ) );
-      double dotsPerMM = destinationDpi / 25.4;
+      const double dotsPerMM = QgsPainting::pixelsPerMm( destinationDpi );
+      image.setDotsPerMeterX( static_cast< int >( std::round( 1000 * dotsPerMM ) ) );
+      image.setDotsPerMeterY( static_cast< int >( std::round( 1000 * dotsPerMM ) ) );
       QPainter p( &image );
 
       QPointF tl = -boundingRect().topLeft();
@@ -1273,7 +1274,7 @@ void QgsLayoutItemMap::paint( QPainter *painter, const QStyleOptionGraphicsItem 
         QgsScopedQPainterState stagedPainterState( painter );
         painter->translate( mXOffset, mYOffset );
 
-        double dotsPerMM = paintDevice->logicalDpiX() / 25.4;
+        const double dotsPerMM = QgsPainting::pixelsPerMm( paintDevice->logicalDpiX() );
         size *= dotsPerMM; // output size will be in dots (pixels)
         painter->scale( 1 / dotsPerMM, 1 / dotsPerMM ); // scale painter from mm to dots
 
@@ -2673,7 +2674,7 @@ void QgsLayoutItemMap::drawAnnotation( const QgsAnnotation *annotation, QgsRende
   context.painter()->translate( itemX, itemY );
 
   //setup painter scaling to dots so that symbology is drawn to scale
-  double dotsPerMM = context.painter()->device()->logicalDpiX() / 25.4;
+  const double dotsPerMM = QgsPainting::pixelsPerMm( context.painter()->device()->logicalDpiX() );
   context.painter()->scale( 1 / dotsPerMM, 1 / dotsPerMM ); // scale painter from mm to dots
 
   annotation->render( context );

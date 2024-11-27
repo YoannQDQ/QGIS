@@ -21,6 +21,7 @@
 #include "qgssettings.h"
 #include "qgsgui.h"
 #include "qgshelp.h"
+#include "qgspainting.h"
 
 #include <QCheckBox>
 #include <QPushButton>
@@ -54,6 +55,7 @@ QgsLayoutImageExportOptionsDialog::QgsLayoutImageExportOptionsDialog( QWidget *p
 void QgsLayoutImageExportOptionsDialog::setResolution( double resolution )
 {
   mResolutionSpinBox->setValue( resolution );
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( resolution );
 
   if ( mImageSize.isValid() )
   {
@@ -66,8 +68,8 @@ void QgsLayoutImageExportOptionsDialog::setResolution( double resolution )
     }
     else
     {
-      mWidthSpinBox->setValue( mImageSize.width() * resolution / 25.4 );
-      mHeightSpinBox->setValue( mImageSize.height() * resolution / 25.4 );
+      mWidthSpinBox->setValue( mImageSize.width() * pixelsPerMm );
+      mHeightSpinBox->setValue( mImageSize.height() * pixelsPerMm );
     }
     mWidthSpinBox->blockSignals( false );
     mHeightSpinBox->blockSignals( false );
@@ -82,10 +84,11 @@ double QgsLayoutImageExportOptionsDialog::resolution() const
 void QgsLayoutImageExportOptionsDialog::setImageSize( QSizeF size )
 {
   mImageSize = size;
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( mResolutionSpinBox->value() );
   mWidthSpinBox->blockSignals( true );
   mHeightSpinBox->blockSignals( true );
-  mWidthSpinBox->setValue( size.width() * mResolutionSpinBox->value() / 25.4 );
-  mHeightSpinBox->setValue( size.height() * mResolutionSpinBox->value() / 25.4 );
+  mWidthSpinBox->setValue( size.width() * pixelsPerMm );
+  mHeightSpinBox->setValue( size.height() * pixelsPerMm );
   mWidthSpinBox->blockSignals( false );
   mHeightSpinBox->blockSignals( false );
 }
@@ -201,8 +204,9 @@ void QgsLayoutImageExportOptionsDialog::mResolutionSpinBox_valueChanged( int val
   }
   else
   {
-    mWidthSpinBox->setValue( mImageSize.width() * value / 25.4 );
-    mHeightSpinBox->setValue( mImageSize.height() * value / 25.4 );
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( value );
+    mWidthSpinBox->setValue( mImageSize.width() * pixelsPerMm );
+    mHeightSpinBox->setValue( mImageSize.height() * pixelsPerMm );
   }
   mWidthSpinBox->blockSignals( false );
   mHeightSpinBox->blockSignals( false );
@@ -220,8 +224,9 @@ void QgsLayoutImageExportOptionsDialog::clipToContentsToggled( bool state )
   }
   else
   {
-    whileBlocking( mWidthSpinBox )->setValue( mImageSize.width() * mResolutionSpinBox->value() / 25.4 );
-    whileBlocking( mHeightSpinBox )->setValue( mImageSize.height() * mResolutionSpinBox->value() / 25.4 );
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( mResolutionSpinBox->value() );
+    whileBlocking( mWidthSpinBox )->setValue( mImageSize.width() * pixelsPerMm );
+    whileBlocking( mHeightSpinBox )->setValue( mImageSize.height() * pixelsPerMm );
   }
 }
 

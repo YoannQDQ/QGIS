@@ -85,12 +85,12 @@ void QgsAnnotation::setRelativePosition( QPointF position )
 void QgsAnnotation::setFrameOffsetFromReferencePoint( QPointF offset )
 {
   // convert from offset in pixels at 96 dpi to mm
-  setFrameOffsetFromReferencePointMm( offset / 3.7795275 );
+  setFrameOffsetFromReferencePointMm( offset / QgsPainting::pixelsPerMm() );
 }
 
 QPointF QgsAnnotation::frameOffsetFromReferencePoint() const
 {
-  return mOffsetFromReferencePoint / 3.7795275;
+  return mOffsetFromReferencePoint * QgsPainting::pixelsPerMm();
 }
 
 void QgsAnnotation::setFrameOffsetFromReferencePointMm( QPointF offset )
@@ -104,12 +104,12 @@ void QgsAnnotation::setFrameOffsetFromReferencePointMm( QPointF offset )
 void QgsAnnotation::setFrameSize( QSizeF size )
 {
   // convert from size in pixels at 96 dpi to mm
-  setFrameSizeMm( size / 3.7795275 );
+  setFrameSizeMm( size / QgsPainting::pixelsPerMm() );
 }
 
 QSizeF QgsAnnotation::frameSize() const
 {
-  return mFrameSize / 3.7795275;
+  return mFrameSize * QgsPainting::pixelsPerMm();
 }
 
 void QgsAnnotation::setFrameSizeMm( QSizeF size )
@@ -165,10 +165,6 @@ void QgsAnnotation::render( QgsRenderContext &context ) const
   }
   const QSizeF size( context.convertToPainterUnits( mFrameSize.width(), Qgis::RenderUnit::Millimeters ) - context.convertToPainterUnits( mContentsMargins.left() + mContentsMargins.right(), Qgis::RenderUnit::Millimeters ),
                      context.convertToPainterUnits( mFrameSize.height(), Qgis::RenderUnit::Millimeters ) - context.convertToPainterUnits( mContentsMargins.top() + mContentsMargins.bottom(), Qgis::RenderUnit::Millimeters ) );
-
-  // scale back from painter dpi to 96 dpi --
-// double dotsPerMM = context.painter()->device()->logicalDpiX() / ( 25.4 * 3.78 );
-// context.painter()->scale( dotsPerMM, dotsPerMM );
 
   renderAnnotation( context, size );
 }
@@ -329,24 +325,24 @@ void QgsAnnotation::_readXml( const QDomElement &annotationElem, const QgsReadWr
   }
 
   mContentsMargins = QgsMargins::fromString( annotationElem.attribute( QStringLiteral( "contentsMargin" ) ) );
-  const double dpiScale = 25.4 / QgsPainting::qtDefaultDpiX();
+  const double pixelsPerMm = QgsPainting::pixelsPerMm();
   if ( annotationElem.hasAttribute( QStringLiteral( "frameWidthMM" ) ) )
     mFrameSize.setWidth( annotationElem.attribute( QStringLiteral( "frameWidthMM" ), QStringLiteral( "5" ) ).toDouble() );
   else
-    mFrameSize.setWidth( dpiScale * annotationElem.attribute( QStringLiteral( "frameWidth" ), QStringLiteral( "50" ) ).toDouble() );
+    mFrameSize.setWidth( pixelsPerMm * annotationElem.attribute( QStringLiteral( "frameWidth" ), QStringLiteral( "50" ) ).toDouble() );
   if ( annotationElem.hasAttribute( QStringLiteral( "frameHeightMM" ) ) )
     mFrameSize.setHeight( annotationElem.attribute( QStringLiteral( "frameHeightMM" ), QStringLiteral( "3" ) ).toDouble() );
   else
-    mFrameSize.setHeight( dpiScale * annotationElem.attribute( QStringLiteral( "frameHeight" ), QStringLiteral( "50" ) ).toDouble() );
+    mFrameSize.setHeight( pixelsPerMm * annotationElem.attribute( QStringLiteral( "frameHeight" ), QStringLiteral( "50" ) ).toDouble() );
 
   if ( annotationElem.hasAttribute( QStringLiteral( "offsetXMM" ) ) )
     mOffsetFromReferencePoint.setX( annotationElem.attribute( QStringLiteral( "offsetXMM" ), QStringLiteral( "0" ) ).toDouble() );
   else
-    mOffsetFromReferencePoint.setX( dpiScale * annotationElem.attribute( QStringLiteral( "offsetX" ), QStringLiteral( "0" ) ).toDouble() );
+    mOffsetFromReferencePoint.setX( pixelsPerMm * annotationElem.attribute( QStringLiteral( "offsetX" ), QStringLiteral( "0" ) ).toDouble() );
   if ( annotationElem.hasAttribute( QStringLiteral( "offsetYMM" ) ) )
     mOffsetFromReferencePoint.setY( annotationElem.attribute( QStringLiteral( "offsetYMM" ), QStringLiteral( "0" ) ).toDouble() );
   else
-    mOffsetFromReferencePoint.setY( dpiScale * annotationElem.attribute( QStringLiteral( "offsetY" ), QStringLiteral( "0" ) ).toDouble() );
+    mOffsetFromReferencePoint.setY( pixelsPerMm * annotationElem.attribute( QStringLiteral( "offsetY" ), QStringLiteral( "0" ) ).toDouble() );
 
   mHasFixedMapPosition = annotationElem.attribute( QStringLiteral( "mapPositionFixed" ), QStringLiteral( "1" ) ).toInt();
   mVisible = annotationElem.attribute( QStringLiteral( "visible" ), QStringLiteral( "1" ) ).toInt();
@@ -391,8 +387,9 @@ void QgsAnnotation::_readXml( const QDomElement &annotationElem, const QgsReadWr
     frameBackgroundColor.setNamedColor( annotationElem.attribute( QStringLiteral( "frameBackgroundColor" ) ) );
     frameBackgroundColor.setAlpha( annotationElem.attribute( QStringLiteral( "frameBackgroundColorAlpha" ), QStringLiteral( "255" ) ).toInt() );
     double frameBorderWidth = annotationElem.attribute( QStringLiteral( "frameBorderWidth" ), QStringLiteral( "0.5" ) ).toDouble();
+
     // need to roughly convert border width from pixels to mm - just assume 96 dpi
-    frameBorderWidth = frameBorderWidth * 25.4 / 96.0;
+    frameBorderWidth = frameBorderWidth / pixelsPerMm;
     QVariantMap props;
     props.insert( QStringLiteral( "color" ), frameBackgroundColor.name() );
     props.insert( QStringLiteral( "style" ), QStringLiteral( "solid" ) );

@@ -33,6 +33,7 @@
 #include "qgslayoutrendercontext.h"
 #include "qgslayoutreportcontext.h"
 #include "qgsprofilesourceregistry.h"
+#include "qgspainting.h"
 #include "qgssymbollayerutils.h"
 
 #include <QTimer>
@@ -660,9 +661,9 @@ void QgsLayoutItemElevationProfile::paint( QPainter *painter, const QStyleOption
         QImage image = QImage( widthInPixels, heightInPixels, QImage::Format_ARGB32 );
 
         image.fill( Qt::transparent );
-        image.setDotsPerMeterX( static_cast< int >( std::round( 1000 * destinationDpi / 25.4 ) ) );
-        image.setDotsPerMeterY( static_cast< int >( std::round( 1000 * destinationDpi / 25.4 ) ) );
-        double dotsPerMM = destinationDpi / 25.4;
+        const double dotsPerMM = QgsPainting::pixelsPerMm( destinationDpi );
+        image.setDotsPerMeterX( static_cast< int >( std::round( 1000 * dotsPerMM ) ) );
+        image.setDotsPerMeterY( static_cast< int >( std::round( 1000 * dotsPerMM ) ) );
         layoutSize *= dotsPerMM; // output size will be in dots (pixels)
         QPainter p( &image );
         preparePainter( &p );
@@ -729,7 +730,7 @@ void QgsLayoutItemElevationProfile::paint( QPainter *painter, const QStyleOption
 
         QgsScopedQPainterState painterState( painter );
         QgsScopedQPainterState stagedPainterState( painter );
-        double dotsPerMM = paintDevice->logicalDpiX() / 25.4;
+        double dotsPerMM = QgsPainting::pixelsPerMm( paintDevice->logicalDpiX() );
         layoutSize *= dotsPerMM; // output size will be in dots (pixels)
         painter->scale( 1 / dotsPerMM, 1 / dotsPerMM ); // scale painter from mm to dots
 

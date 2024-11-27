@@ -25,6 +25,7 @@
 #include "qgssymbol.h"
 #include "qgsstyleentityvisitor.h"
 #include "qgsfillsymbol.h"
+#include "qgspainting.h"
 
 #include <limits>
 
@@ -86,7 +87,8 @@ void QgsLayoutItemPolygon::refreshSymbol()
   if ( auto *lLayout = layout() )
   {
     const QgsRenderContext rc = QgsLayoutUtils::createRenderContextForLayout( lLayout, nullptr, lLayout->renderContext().dpi() );
-    mMaxSymbolBleed = ( 25.4 / lLayout->renderContext().dpi() ) * QgsSymbolLayerUtils::estimateMaxSymbolBleed( mPolygonStyleSymbol.get(), rc );
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( lLayout->renderContext().dpi() );
+    mMaxSymbolBleed = QgsSymbolLayerUtils::estimateMaxSymbolBleed( mPolygonStyleSymbol.get(), rc ) / pixelsPerMm;
   }
 
   updateSceneRect();

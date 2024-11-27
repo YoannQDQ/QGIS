@@ -97,7 +97,7 @@ void QgsLayoutItemMapOverview::draw( QPainter *painter )
   QPolygonF intersectExtent = thisExtent.intersected( otherExtent );
 
   //setup painter scaling to dots so that raster symbology is drawn to scale
-  double dotsPerMM = painter->device()->logicalDpiX() / 25.4;
+  double dotsPerMM = QgsPainting::pixelsPerMm( painter->device()->logicalDpiX() );
 
   //setup render context
   QgsRenderContext context = QgsLayoutUtils::createRenderContextForLayout( mLayout, painter );

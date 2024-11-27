@@ -30,6 +30,7 @@
 #include "qgslabelingresults.h"
 #include "qgssettingsentryimpl.h"
 #include "qgssettingstree.h"
+#include "qgspainting.h"
 
 #include <QImageWriter>
 #include <QSize>
@@ -316,11 +317,12 @@ QImage QgsLayoutExporter::renderRegionToImage( const QRectF &region, QSize image
   QImage image( QSize( width, height ), QImage::Format_ARGB32 );
   if ( !image.isNull() )
   {
+    const double pixelsPerMm = QgsPainting::pixelsPerMm( resolution );
     // see https://doc.qt.io/qt-5/qpainter.html#limitations
     if ( width > 32768 || height > 32768 )
       QgsMessageLog::logMessage( QObject::tr( "Error: output width or height is larger than 32768 pixel, result will be clipped" ) );
-    image.setDotsPerMeterX( static_cast< int >( std::round( resolution / 25.4 * 1000 ) ) );
-    image.setDotsPerMeterY( static_cast< int>( std::round( resolution / 25.4 * 1000 ) ) );
+    image.setDotsPerMeterX( static_cast< int >( std::round( pixelsPerMm * 1000 ) ) );
+    image.setDotsPerMeterY( static_cast< int>( std::round( pixelsPerMm * 1000 ) ) );
     image.fill( Qt::transparent );
     QPainter imagePainter( &image );
     renderRegion( &imagePainter, region );
@@ -1710,8 +1712,9 @@ std::unique_ptr<double[]> QgsLayoutExporter::computeGeoTransform( const QgsLayou
   }
 
   // calculate scaling of pixels
-  int pageWidthPixels = static_cast< int >( dpi * outputWidthMM / 25.4 );
-  int pageHeightPixels = static_cast< int >( dpi * outputHeightMM / 25.4 );
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( dpi );
+  int pageWidthPixels = static_cast< int >( pixelsPerMm * outputWidthMM );
+  int pageHeightPixels = static_cast< int >( pixelsPerMm * outputHeightMM );
   double pixelWidthScale = paperExtent.width() / pageWidthPixels;
   double pixelHeightScale = paperExtent.height() / pageHeightPixels;
 
@@ -2098,11 +2101,9 @@ void QgsLayoutExporter::computeWorldFileParameters( const QRectF &exportRegion, 
   double X0 = paperExtent.xMinimum();
   double Y0 = paperExtent.yMinimum();
 
-  if ( dpi < 0 )
-    dpi = mLayout->renderContext().dpi();
-
-  int widthPx = static_cast< int >( dpi * destinationWidth / 25.4 );
-  int heightPx = static_cast< int >( dpi * destinationHeight / 25.4 );
+  const double pixelsPerMm = QgsPainting::pixelsPerMm( dpi < 0 ? mLayout->renderContext().dpi() : dpi );
+  int widthPx = static_cast< int >( destinationWidth * pixelsPerMm );
+  int heightPx = static_cast< int >( destinationHeight * pixelsPerMm );
 
   double Ww = paperExtent.width() / widthPx;
   double Hh = paperExtent.height() / heightPx;

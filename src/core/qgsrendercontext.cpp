@@ -25,6 +25,7 @@
 #include "qgsunittypes.h"
 #include "qgssymbollayer.h"
 #include "qgsgeometrypaintdevice.h"
+#include "qgspainting.h"
 
 #define POINTS_TO_MM 2.83464567
 #define INCH_TO_MM 25.4
@@ -165,11 +166,11 @@ QgsRenderContext QgsRenderContext::fromQPainter( QPainter *painter )
   context.setPainter( painter );
   if ( painter && painter->device() )
   {
-    context.setScaleFactor( painter->device()->physicalDpiX() / 25.4 );
+    context.setScaleFactor( QgsPainting::pixelsPerMm( painter->device()->physicalDpiX() ) );
   }
   else
   {
-    context.setScaleFactor( 3.465 ); //assume 88 dpi as standard value
+    context.setScaleFactor( QgsPainting::pixelsPerMm( 88 ) ); //assume 88 dpi as standard value
   }
 
   if ( painter && painter->renderHints() & QPainter::Antialiasing )

@@ -38,6 +38,7 @@
 #include "qgslayout.h"
 #include "qgsunittypes.h"
 #include "qgslayoutrendercontext.h"
+#include "qgspainting.h"
 
 #include <QVector2D>
 #include <math.h>
@@ -622,7 +623,7 @@ void QgsLayoutItemMapGrid::draw( QPainter *p )
   }
 
   //setup painter scaling to dots so that raster symbology is drawn to scale
-  const double dotsPerMM = paintDevice->logicalDpiX() / 25.4;
+  const double dotsPerMM = QgsPainting::pixelsPerMm( paintDevice->logicalDpiX() );
   p->scale( 1 / dotsPerMM, 1 / dotsPerMM ); //scale painter from mm to dots
 
   //setup render context
