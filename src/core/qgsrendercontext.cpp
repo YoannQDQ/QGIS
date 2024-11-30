@@ -170,7 +170,7 @@ QgsRenderContext QgsRenderContext::fromQPainter( QPainter *painter )
   }
   else
   {
-    context.setScaleFactor( QgsPainting::pixelsPerMm( 88 ) ); //assume 88 dpi as standard value
+    context.setScaleFactor( QgsPainting::pixelsPerMm() );
   }
 
   if ( painter && painter->renderHints() & QPainter::Antialiasing )

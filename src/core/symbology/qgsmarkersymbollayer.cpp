@@ -2325,8 +2325,7 @@ double QgsSvgMarkerSymbolLayer::updateDefaultAspectRatio()
   {
     //size
     const double size = mSize;
-    //assume 88 dpi as standard value
-    const double widthScaleFactor = QgsPainting::pixelsPerMm( 88 );
+    const double widthScaleFactor = QgsPainting::pixelsPerMm();
     const QSizeF svgViewbox = QgsApplication::svgCache()->svgViewboxSize( mPath, size, mColor, mStrokeColor, mStrokeWidth, widthScaleFactor );
     // set default aspect ratio
     mDefaultAspectRatio = svgViewbox.isValid() ? svgViewbox.height() / svgViewbox.width() : 0.0;

@@ -59,9 +59,9 @@ create initialized QgsRenderContext instance from given
 
     static QgsRenderContext fromQPainter( QPainter *painter );
 %Docstring
-Creates a default render context given a pixel based QPainter
-destination. If no painter is specified or the painter has no device,
-then a default DPI of 88 will be assumed.
+Creates a default render context given a pixel based QPainter destination.
+If no painter is specified or the painter has no device, then a default
+DPI (returned by qt_defaultDpiX) will be assumed.
 %End
 
 
