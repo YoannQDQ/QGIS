@@ -95,7 +95,7 @@ class CORE_EXPORT QgsRenderContext : public QgsTemporalRangeObject
     /**
      * Creates a default render context given a pixel based QPainter destination.
      * If no painter is specified or the painter has no device, then a default
-     * DPI of 88 will be assumed.
+     * DPI (returned by qt_defaultDpiX) will be assumed.
      */
     static QgsRenderContext fromQPainter( QPainter *painter );
 

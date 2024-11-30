@@ -28,6 +28,7 @@
 #include "qgsfieldexpressionwidget.h"
 #include "qgssymbollayerwidget.h"
 #include "qgsvectorlayer.h"
+#include "qgspainting.h"
 
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
@@ -276,7 +277,7 @@ QPixmap QgsSvgSelectorListModel::createPreview( const QString &entry ) const
     strokeWidth = 0.2;
 
   bool fitsInCache; // should always fit in cache at these sizes (i.e. under 559 px ^ 2, or half cache size)
-  QImage img = QgsApplication::svgCache()->svgAsImage( entry, mIconSize, fill, stroke, strokeWidth, 3.5 /*appr. 88 dpi*/, fitsInCache );
+  QImage img = QgsApplication::svgCache()->svgAsImage( entry, mIconSize, fill, stroke, strokeWidth, QgsPainting::pixelsPerMm(), fitsInCache );
   return QPixmap::fromImage( img );
 }
 

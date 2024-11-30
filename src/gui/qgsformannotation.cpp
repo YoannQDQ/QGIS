@@ -29,6 +29,7 @@
 #include "qgsvectorlayer.h"
 #include "qgsgui.h"
 #include "qgsfillsymbol.h"
+#include "qgspainting.h"
 
 #include <QDomElement>
 #include <QDir>
@@ -65,7 +66,7 @@ void QgsFormAnnotation::setDesignerForm( const QString &uiFile )
       newFill->setColor( mDesignerWidget->palette().color( QPalette::Window ) );
       setFillSymbol( newFill );
     }
-    setFrameSize( preferredFrameSize() );
+    setFrameSizeMm( preferredFrameSize() / QgsPainting::pixelsPerMm() );
   }
   emit appearanceChanged();
 }
