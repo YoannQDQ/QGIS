@@ -101,8 +101,7 @@ QgsRenderContext QgsLayoutUtils::createRenderContextForMap( QgsLayoutItemMap *ma
 {
   if ( dpi < 0 )
   {
-    // default to 88 dpi if no painter specified
-    dpi = ( painter && painter->device() ) ? painter->device()->logicalDpiX() : 88;
+    dpi = ( painter && painter->device() ) ? painter->device()->logicalDpiX() : QgsPainting::qtDefaultDpiX();
   }
   double dotsPerMM = QgsPainting::pixelsPerMm( dpi );
 
@@ -110,7 +109,7 @@ QgsRenderContext QgsLayoutUtils::createRenderContextForMap( QgsLayoutItemMap *ma
   {
     QgsRenderContext context;
     context.setPainter( painter );
-    context.setScaleFactor( dotsPerMM ); //assume 88 dpi as standard value
+    context.setScaleFactor( dotsPerMM );
     return context;
   }
   else

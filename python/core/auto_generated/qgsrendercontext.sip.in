@@ -60,7 +60,7 @@ create initialized QgsRenderContext instance from given :py:class:`QgsMapSetting
 %Docstring
 Creates a default render context given a pixel based QPainter destination.
 If no painter is specified or the painter has no device, then a default
-DPI of 88 will be assumed.
+DPI (returned by qt_defaultDpiX) will be assumed.
 %End
 
 
