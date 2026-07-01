@@ -111,7 +111,7 @@ jobs:
           swap-storage: true
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -143,7 +143,7 @@ jobs:
 
       - name: Build Docker Container with Build Environment
         id: docker-build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f  # v7.1.0
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
         with:
           context: .
           file: .docker/qgis3-${{ matrix.distro }}-qt${{ matrix.qt-version }}-build-deps.dockerfile
@@ -159,7 +159,7 @@ jobs:
           STEPS_DOCKER_BUILD_OUTPUTS_IMAGEID: ${{ steps.docker-build.outputs.imageid }}
 
       - name: Restore build cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /home/runner/QGIS/.ccache
           key: build-ccache-${{ matrix.distro }}-qt${{ matrix.qt-version }}-${{ github.event.pull_request.base.ref || github.ref_name }}
@@ -198,7 +198,7 @@ jobs:
                      /root/QGIS/.docker/docker-qgis-build.sh
 
       - name: Save build cache for push only
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: ${{ github.event_name == 'push' }}
         with:
           path: /home/runner/QGIS/.ccache
@@ -325,7 +325,7 @@ jobs:
           swap-storage: true
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -353,7 +353,7 @@ jobs:
 
       - name: Build Docker Container with Testing Environment
         id: docker-build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f  # v7.1.0
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
         with:
           context: .
           file: .docker/qgis3-${{ matrix.distro }}-qt${{ matrix.qt-version }}-build-deps.dockerfile
@@ -457,7 +457,7 @@ jobs:
           swap-storage: true
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 2
           persist-credentials: false
@@ -471,7 +471,7 @@ jobs:
 
       - name: Build Docker Container with Testing Environment
         id: docker-build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f  #  v7.1.0
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  #  v7.2.0
         with:
           context: .
           file: .docker/qgis3-${{ matrix.distro }}-qt${{ matrix.qt-version }}-build-deps.dockerfile
